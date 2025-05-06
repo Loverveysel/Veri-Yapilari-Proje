@@ -4,7 +4,7 @@ namespace Veri_Yapilari_Proje.Models
 {
     public class ListManager
     {
-        // Farklı liste türleri için nesneler
+        
         private SinglyLinkedList singlyList = new SinglyLinkedList();
         private DoublyLinkedList doublyList = new DoublyLinkedList();
         private CircularLinkedList circularList = new CircularLinkedList();
