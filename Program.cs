@@ -1,25 +1,18 @@
-var builder = WebApplication.CreateBuilder(args);
+using System;
+using Veri_Yapilari_Proje.Models;
 
-// Add services to the container.
-builder.Services.AddRazorPages();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+class Program
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    static void Main()
+    {
+        ListManager manager = new ListManager();
+
+        manager.ProcessCommand("singly", "add", 10);
+        manager.ProcessCommand("singly", "add", 20);
+        manager.ProcessCommand("singly", "add", 30);
+
+        string jsonOutput = manager.GetListAsJson("singly");
+
+        Console.WriteLine(jsonOutput);
+    }
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapRazorPages();
-
-app.Run();
