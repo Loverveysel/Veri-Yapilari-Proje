@@ -30,7 +30,7 @@ namespace Veri_Yapilari_Proje.Models
         public static string SerializeDoublyList(DoublyLinkedList list)
         {
             var nodes = new List<Dictionary<string, object>>();
-            var current = list.Head; // Listenin başından başlıyoruz
+            var current = list.Head; 
 
             while (current != null)
             {
@@ -55,9 +55,9 @@ namespace Veri_Yapilari_Proje.Models
             var current = list.Head;
 
             if (current == null)
-                return JsonSerializer.Serialize(nodes); // Liste boşsa boş liste dön
+                return JsonSerializer.Serialize(nodes); 
 
-            var start = current; // Nereden başladığımızı hatırlıyoruz
+            var start = current; 
 
             do
             {
