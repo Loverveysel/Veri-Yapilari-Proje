@@ -2,3 +2,69 @@
 @model Veri_Yapıları_Proje.Pages.LinkedList.IndexModel
 @{
 }
+@{
+    ViewData["Title"] = "Bağlı Liste Simülasyonu";
+}
+
+<h2>Bağlı Liste Simülasyonu</h2>
+
+<form method="post">
+    <input type="number" asp-for="NodeValue" placeholder="Düğüm Değeri" />
+
+    <select asp-for="SelectedListType">
+        <option value="singly">Tek Yönlü</option>
+        <option value="doubly">Çift Yönlü</option>
+        <option value="circular">Döngüsel</option>
+    </select>
+
+    <select asp-for="ActionType">
+        <option value="add">Ekle</option>
+        <option value="remove">Sil</option>
+        <option value="search">Ara</option>
+        <option value="traverse">Gez</option>
+    </select>
+
+    <button type="submit">Gönder</button>
+</form>
+
+<hr />
+
+<div id="list-container">
+    <!-- Liste animasyonu buraya basılacak -->
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const listData = @Html.Raw(Model.ListJson);
+        console.log(listData)
+
+        const container = document.getElementById("list-container");
+        container.innerHTML = "";
+
+        listData.forEach((node, index) => {
+            const nodeDiv = document.createElement("div");
+            nodeDiv.className = "node";
+            nodeDiv.textContent = node.Value;
+            container.appendChild(nodeDiv);
+
+            if (!node.isLast || '@Model.SelectedListType' === "circular") {
+                const arrow = document.createElement("span");
+                arrow.innerHTML = "→";
+                container.appendChild(arrow);
+            }
+        });
+    </script>
+
+    <style>
+        .node {
+            display: inline-block;
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #000;
+            border-radius: 6px;
+            background-color: lightblue;
+            transition: background-color 0.3s;
+        }
+    </style>
+}
