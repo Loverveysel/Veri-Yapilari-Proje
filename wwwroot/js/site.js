@@ -1,4 +1,5 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿// site.js
+document.addEventListener('DOMContentLoaded', function () {
     const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
     let linkedListData = [];
     let isAnimating = false;
@@ -13,22 +14,15 @@
     // UI Elements
     const listTypeSelect = document.getElementById('listTypeSelect');
     const operationSelect = document.getElementById('operationSelect');
-    const subOperationSelect = document.getElementById('subOperationSelect');
+    const subOperationGroup = document.getElementById('subOperationGroup');
+    const subOperationRadios = document.querySelectorAll('input[name="subOperation"]');
     const dataInput = document.getElementById('dataInput');
     const indexInput = document.getElementById('indexInput');
     const executeBtn = document.getElementById('executeBtn');
     const clearBtn = document.getElementById('clearBtn');
     const linkedListContainer = document.getElementById('linkedListContainer');
-    const subOperationGroup = document.getElementById('subOperationGroup');
     const dataGroup = document.getElementById('dataGroup');
     const indexGroup = document.getElementById('indexGroup');
-
-    // Sub operations
-    const subOperations = {
-        insert: ['InsertFront', 'InsertBack', 'InsertAt'],
-        delete: ['RemoveFront', 'RemoveBack', 'RemoveAt', 'Clear'],
-        utilities: ['UpdateData', 'Search']
-    };
 
     // Initialize SVG
     const svgNS = "http://www.w3.org/2000/svg";
@@ -82,55 +76,67 @@
     // Operation selection
     operationSelect.addEventListener('change', function () {
         const selectedOperation = this.value;
-        subOperationSelect.innerHTML = '<option value="">Select sub-operation</option>';
         subOperationGroup.style.display = selectedOperation ? 'block' : 'none';
         dataGroup.style.display = 'none';
         indexGroup.style.display = 'none';
         executeBtn.disabled = true;
 
-        if (selectedOperation) {
-            subOperations[selectedOperation].forEach(op => {
-                const option = document.createElement('option');
-                option.value = op.toLowerCase();
-                option.textContent = op;
-                subOperationSelect.appendChild(option);
-            });
-        }
+        // Reset radio buttons
+        subOperationRadios.forEach(radio => {
+            radio.checked = false;
+        });
+
+        // Show/hide relevant radio buttons based on selected operation
+        subOperationRadios.forEach(radio => {
+            const parentDiv = radio.closest('.form-check');
+            if (selectedOperation === 'insert') {
+                parentDiv.style.display = radio.id === 'insertFront' || radio.id === 'insertBack' || radio.id === 'insertAt' ? 'block' : 'none';
+            } else if (selectedOperation === 'delete') {
+                parentDiv.style.display = radio.id === 'removeFront' || radio.id === 'removeBack' || radio.id === 'removeAt' || radio.id === 'clear' ? 'block' : 'none';
+            } else if (selectedOperation === 'utilities') {
+                parentDiv.style.display = radio.id === 'updateData' || radio.id === 'search' ? 'block' : 'none';
+            } else {
+                parentDiv.style.display = 'none';
+            }
+        });
     });
 
-    // Sub operation selection
-    subOperationSelect.addEventListener('change', function () {
-        const selectedSubOp = this.value;
-        dataGroup.style.display = 'none';
-        indexGroup.style.display = 'none';
-        executeBtn.disabled = true;
+    // Sub operation radio button selection
+    subOperationRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (!this.checked) return;
 
-        if (operationSelect.value === 'insert') {
-            dataGroup.style.display = 'block';
-            if (selectedSubOp === 'insertat') {
-                indexGroup.style.display = 'block';
-            }
-        }
-        else if (operationSelect.value === 'delete') {
-            if (selectedSubOp === 'removeat') {
-                indexGroup.style.display = 'block';
-            }
-            else if (selectedSubOp === 'clear') {
-                executeBtn.disabled = false;
-                return;
-            }
-        }
-        else if (operationSelect.value === 'utilities') {
-            if (selectedSubOp === 'updatedata') {
+            dataGroup.style.display = 'none';
+            indexGroup.style.display = 'none';
+            executeBtn.disabled = true;
+
+            if (operationSelect.value === 'insert') {
                 dataGroup.style.display = 'block';
-                indexGroup.style.display = 'block';
+                if (this.value === 'insertat') {
+                    indexGroup.style.display = 'block';
+                }
             }
-            else if (selectedSubOp === 'search') {
-                indexGroup.style.display = 'block';
+            else if (operationSelect.value === 'delete') {
+                if (this.value === 'removeat') {
+                    indexGroup.style.display = 'block';
+                }
+                else if (this.value === 'clear') {
+                    executeBtn.disabled = false;
+                    return;
+                }
             }
-        }
+            else if (operationSelect.value === 'utilities') {
+                if (this.value === 'updatedata') {
+                    dataGroup.style.display = 'block';
+                    indexGroup.style.display = 'block';
+                }
+                else if (this.value === 'search') {
+                    indexGroup.style.display = 'block';
+                }
+            }
 
-        validateInputs();
+            validateInputs();
+        });
     });
 
     // Clear button
@@ -141,7 +147,7 @@
     // Input validation
     function validateInputs() {
         const operation = operationSelect.value;
-        const subOperation = subOperationSelect.value;
+        const subOperation = document.querySelector('input[name="subOperation"]:checked')?.value;
         const hasData = dataInput.value.trim() !== '';
         const hasIndex = indexInput.value !== '';
 
@@ -175,18 +181,25 @@
         if (isAnimating) return;
         isAnimating = true;
 
+        const selectedSubOp = document.querySelector('input[name="subOperation"]:checked')?.value;
         const requestData = {
             operation: operationSelect.value,
-            subOperation: subOperationSelect.value,
+            subOperation: selectedSubOp,
             data: dataInput.value,
             index: indexInput.value ? parseInt(indexInput.value) : 0
         };
 
         try {
             // Show traversal animation for specific operations
-            if ((requestData.operation === 'insert' && requestData.subOperation === 'insertat') ||
+            if (requestData.operation === 'utilities' && requestData.subOperation === 'search') {
+                const path = await animateTraversal(requestData.index, true);
+                showSearchResult(path);
+                isAnimating = false;
+                return;
+            }
+            else if ((requestData.operation === 'insert' && requestData.subOperation === 'insertat') ||
                 (requestData.operation === 'delete' && requestData.subOperation === 'removeat') ||
-                (requestData.operation === 'utilities' && (requestData.subOperation === 'updatedata' || requestData.subOperation === 'search'))) {
+                (requestData.operation === 'utilities' && requestData.subOperation === 'updatedata')) {
                 await animateTraversal(requestData.index);
             }
 
@@ -248,7 +261,7 @@
 
             // Reset inputs
             operationSelect.value = '';
-            subOperationSelect.innerHTML = '<option value="">Select sub-operation</option>';
+            subOperationRadios.forEach(radio => radio.checked = false);
             dataInput.value = '';
             indexInput.value = '';
             subOperationGroup.style.display = 'none';
@@ -432,8 +445,10 @@
         svg.appendChild(path);
     }
 
-    async function animateTraversal(targetIndex) {
-        if (targetIndex < 0 || targetIndex >= linkedListData.length) return;
+    async function animateTraversal(targetIndex, isSearch = false) {
+        if (targetIndex < 0 || targetIndex >= linkedListData.length) return [];
+
+        const path = [];
 
         // Create pointer
         const pointer = document.createElementNS(svgNS, "circle");
@@ -451,10 +466,12 @@
 
             // Highlight node
             node.classList.add('highlight');
+            path.push(linkedListData[i].data);
+
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            // Remove highlight if not target
-            if (i < targetIndex) {
+            // Remove highlight if not target or if it's a search operation
+            if (i < targetIndex || isSearch) {
                 node.classList.remove('highlight');
             }
         }
@@ -463,6 +480,25 @@
         setTimeout(() => {
             svg.removeChild(pointer);
         }, 500);
+
+        return path;
+    }
+
+    function showSearchResult(path) {
+        if (path.length === 0) return;
+
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed top-0 end-0 m-3';
+        alertDiv.style.zIndex = '1100';
+        alertDiv.innerHTML = `
+            <strong>Search Path:</strong> ${path.join(' → ')}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(alertDiv);
+
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
     }
 
     function showEmptyState() {
@@ -488,7 +524,8 @@
 
     function showErrorMessage(message) {
         const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3';
+        alertDiv.style.zIndex = '1100';
         alertDiv.innerHTML = `
             <i class="bi bi-exclamation-triangle"></i> ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
