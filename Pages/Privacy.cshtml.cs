@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Veri_Yapıları_Proje.Pages
+namespace LinkedListCircular.Pages
 {
     public class PrivacyModel : PageModel
     {
