@@ -1,0 +1,46 @@
+﻿<Window x:Class="CircularLinkedListVisualizer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Dairesel Bağlı Liste Görselleştirici" Height="600" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sol Panel - İşlemler -->
+        <StackPanel Grid.Column="0" Margin="10">
+            <GroupBox Header="4. İşlemler">
+                <StackPanel>
+                    <RadioButton x:Name="rbInsert" Content="Insert" GroupName="Operations" Checked="Operation_Checked"/>
+                    <RadioButton x:Name="rbDelete" Content="5. Delete" GroupName="Operations" Checked="Operation_Checked"/>
+                    <RadioButton x:Name="rbUtilities" Content="6. Utilities" GroupName="Operations" Checked="Operation_Checked"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox x:Name="gbSubOperations" Header="Alt İşlemler" Margin="0,10,0,0" Visibility="Collapsed">
+                <StackPanel x:Name="spSubOperations">
+                    <!-- Sub operations buraya dinamik olarak eklenecek -->
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Girdiler" Margin="0,10,0,0">
+                <StackPanel>
+                    <TextBlock Text="Data:" Margin="0,5"/>
+                    <TextBox x:Name="txtData" IsEnabled="False"/>
+
+                    <TextBlock Text="Index:" Margin="0,5"/>
+                    <TextBox x:Name="txtIndex" IsEnabled="False"/>
+                </StackPanel>
+            </GroupBox>
+
+            <Button x:Name="btnExecute" Content="Execute" Margin="0,10" Height="30" 
+                    IsEnabled="False" Click="btnExecute_Click"/>
+        </StackPanel>
+
+        <!-- Sağ Panel - Görselleştirme -->
+        <Grid Grid.Column="1" Margin="10">
+            <Canvas x:Name="canvasVisualization" Background="WhiteSmoke"/>
+        </Grid>
+    </Grid>
+</Window>
