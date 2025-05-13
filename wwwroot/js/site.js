@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // List type selection - clear on change
     listTypeSelect.addEventListener('change', function () {
         currentListType = this.value;
-        clearList(true); // Full reset with backend clear
+        clearList(true);
     });
 
     // Operation selection
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Clear button
     clearBtn.addEventListener('click', async function () {
-        await clearList(true); // Full reset with backend clear
+        await clearList(true);
     });
 
     // Input validation
@@ -222,11 +222,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 indexInput.value = '';
                 executeBtn.disabled = true;
             } else {
-                showErrorMessage(result.message || 'Operation failed');
+                showErrorMessage(result.message || 'İşlem başarısız oldu');
             }
         } catch (error) {
-            console.error('Error:', error);
-            showErrorMessage('Operation failed');
+            console.error('Hata:', error);
+            showErrorMessage('İşlem başarısız oldu');
         } finally {
             isAnimating = false;
         }
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function () {
         headLabel.setAttribute('class', 'head-label');
         headLabel.setAttribute('x', nodePositions[0].x);
         headLabel.setAttribute('y', nodePositions[0].y - NODE_RADIUS - 15);
-        headLabel.textContent = 'HEAD';
+        headLabel.textContent = 'BAŞ';
         svg.appendChild(headLabel);
     }
 
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const indexText = document.createElementNS(svgNS, "text");
         indexText.setAttribute('class', 'node-index');
         indexText.setAttribute('y', -NODE_RADIUS - 5);
-        indexText.textContent = `Index: ${index}`;
+        indexText.textContent = `Pozisyon: ${index}`;
         nodeGroup.appendChild(indexText);
 
         // Node next info
@@ -491,8 +491,8 @@ document.addEventListener('DOMContentLoaded', function () {
         alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed top-0 end-0 m-3';
         alertDiv.style.zIndex = '1100';
         alertDiv.innerHTML = `
-            <strong>Search Path:</strong> ${path.join(' → ')}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <strong>Arama Yolu:</strong> ${path.join(' → ')}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
         `;
         document.body.appendChild(alertDiv);
 
@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function () {
             emptyState.className = 'empty-state';
             emptyState.innerHTML = `
                 <i class="bi bi-list"></i>
-                <p>The list is currently empty</p>
+                <p>Liste şu anda boş</p>
             `;
             linkedListContainer.appendChild(emptyState);
         }
@@ -528,7 +528,7 @@ document.addEventListener('DOMContentLoaded', function () {
         alertDiv.style.zIndex = '1100';
         alertDiv.innerHTML = `
             <i class="bi bi-exclamation-triangle"></i> ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
         `;
         document.body.appendChild(alertDiv);
 
