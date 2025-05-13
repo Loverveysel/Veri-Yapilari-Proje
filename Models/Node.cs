@@ -1,16 +1,15 @@
-﻿namespace Veri_Yapilari_Proje.Models
+﻿namespace LinkedListCircular.Models
 {
     public class Node
     {
-        public int Value { get; set; }       // Düğümün taşıdığı değer
-        public Node Next { get; set; }       // Sonraki düğüme bağlantı (tek, çift, döngüsel için)
-        public Node Prev { get; set; }       // Önceki düğüme bağlantı (çift yönlü için)
+        public string Data { get; set; }
+        public Node Next { get; set; }
+        public int Index { get; set; }
 
-        public Node(int value)
+        public Node(string data)
         {
-            Value = value;
+            Data = data;
             Next = null;
-            Prev = null;
         }
     }
 }

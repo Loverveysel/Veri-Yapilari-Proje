@@ -1,132 +1,207 @@
-﻿using System;
+﻿using System.Text.Json;
 
-namespace Veri_Yapilari_Proje.Models
+namespace LinkedListCircular.Models
 {
     public class CircularLinkedList
     {
-        public Node Head { get; set; }
+        public Node Head { get; private set; }
+        public Node Tail { get; private set; }
+        public int Count { get; private set; }
 
-        public CircularLinkedList()
+        public void InsertFront(string data)
         {
-            Head = null;
-        }
-
-        public void Add(int value)
-        {
-            Node newNode = new Node(value);
-
+            Node newNode = new Node(data);
             if (Head == null)
             {
+                Head = Tail = newNode;
+                newNode.Next = Head;
+            }
+            else
+            {
+                newNode.Next = Head;
                 Head = newNode;
-                Head.Next = Head; // Kendi kendine döngü
+                Tail.Next = Head;
+            }
+            Count++;
+            UpdateIndexes();
+        }
+
+        public void InsertBack(string data)
+        {
+            Node newNode = new Node(data);
+            if (Head == null)
+            {
+                Head = Tail = newNode;
+                newNode.Next = Head;
+            }
+            else
+            {
+                Tail.Next = newNode;
+                Tail = newNode;
+                Tail.Next = Head;
+            }
+            Count++;
+            UpdateIndexes();
+        }
+
+        public void InsertAt(string data, int index)
+        {
+            if (index < 0 || index > Count)
+                throw new ArgumentOutOfRangeException("Index out of range");
+
+            if (index == 0)
+            {
+                InsertFront(data);
+                return;
+            }
+
+            if (index == Count)
+            {
+                InsertBack(data);
+                return;
+            }
+
+            Node newNode = new Node(data);
+            Node current = Head;
+            for (int i = 0; i < index - 1; i++)
+            {
+                current = current.Next;
+            }
+            newNode.Next = current.Next;
+            current.Next = newNode;
+            Count++;
+            UpdateIndexes();
+        }
+
+        public void RemoveFront()
+        {
+            if (Head == null) return;
+
+            if (Head == Tail)
+            {
+                Head = Tail = null;
+            }
+            else
+            {
+                Head = Head.Next;
+                Tail.Next = Head;
+            }
+            Count--;
+            UpdateIndexes();
+        }
+
+        public void RemoveBack()
+        {
+            if (Head == null) return;
+
+            if (Head == Tail)
+            {
+                Head = Tail = null;
             }
             else
             {
                 Node current = Head;
-
-                while (current.Next != Head)
+                while (current.Next != Tail)
                 {
                     current = current.Next;
                 }
-
-                current.Next = newNode;
-                newNode.Next = Head;
+                Tail = current;
+                Tail.Next = Head;
             }
+            Count--;
+            UpdateIndexes();
         }
 
-        public void Remove(int value)
+        public void RemoveAt(int index)
         {
-            if (Head == null)
+            if (index < 0 || index >= Count)
+                throw new ArgumentOutOfRangeException("Index out of range");
+
+            if (index == 0)
             {
-                Console.WriteLine("Liste boş.");
+                RemoveFront();
+                return;
+            }
+
+            if (index == Count - 1)
+            {
+                RemoveBack();
                 return;
             }
 
             Node current = Head;
-            Node previous = null;
+            for (int i = 0; i < index - 1; i++)
+            {
+                current = current.Next;
+            }
+            current.Next = current.Next.Next;
+            Count--;
+            UpdateIndexes();
+        }
 
+        public void UpdateData(int index, string newData)
+        {
+            if (index < 0 || index >= Count)
+                throw new ArgumentOutOfRangeException("Index out of range");
+
+            Node current = Head;
+            for (int i = 0; i < index; i++)
+            {
+                current = current.Next;
+            }
+            current.Data = newData;
+        }
+
+        public string Search(int index)
+        {
+            if (index < 0 || index >= Count)
+                throw new ArgumentOutOfRangeException("Index out of range");
+
+            Node current = Head;
+            for (int i = 0; i < index; i++)
+            {
+                current = current.Next;
+            }
+            return current.Data;
+        }
+
+        public void Clear()
+        {
+            Head = Tail = null;
+            Count = 0;
+        }
+
+        private void UpdateIndexes()
+        {
+            if (Head == null) return;
+
+            Node current = Head;
+            int index = 0;
             do
             {
-                if (current.Value == value)
+                current.Index = index++;
+                current = current.Next;
+            } while (current != Head);
+        }
+
+        public string ToJson()
+        {
+            var nodes = new List<object>();
+            if (Head != null)
+            {
+                Node current = Head;
+                do
                 {
-                    if (previous == null)
+                    nodes.Add(new
                     {
-                        // Tek elemanlı liste
-                        if (current.Next == Head)
-                        {
-                            Head = null;
-                        }
-                        else
-                        {
-                            // Head silinecekse son düğümü bulup onun Next'ini güncelle
-                            Node tail = Head;
-                            while (tail.Next != Head)
-                            {
-                                tail = tail.Next;
-                            }
-                            Head = Head.Next;
-                            tail.Next = Head;
-                        }
-                    }
-                    else
-                    {
-                        previous.Next = current.Next;
-
-                        // Head silinirse güncelle
-                        if (current == Head)
-                        {
-                            Head = current.Next;
-                        }
-                    }
-                    return;
-                }
-
-                previous = current;
-                current = current.Next;
-
-            } while (current != Head);
-
-            Console.WriteLine("Değer bulunamadı.");
-        }
-
-        public Node Search(int value)
-        {
-            if (Head == null)
-                return null;
-
-            Node current = Head;
-
-            do
-            {
-                if (current.Value == value)
-                    return current;
-
-                current = current.Next;
-
-            } while (current != Head);
-
-            return null;
-        }
-
-        public void Traverse()
-        {
-            if (Head == null)
-            {
-                Console.WriteLine("Liste boş.");
-                return;
+                        data = current.Data,
+                        index = current.Index,
+                        nextIndex = current.Next?.Index
+                    });
+                    current = current.Next;
+                } while (current != Head);
             }
-
-            Node current = Head;
-
-            Console.Write("Liste: ");
-
-            do
-            {
-                Console.Write(current.Value + " ");
-                current = current.Next;
-            } while (current != Head);
-
-            Console.WriteLine();
+            return JsonSerializer.Serialize(nodes);
         }
     }
 }
